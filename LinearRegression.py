@@ -1,16 +1,15 @@
 #
-# CIS 472/572 - Logistic Regression Template Code
 #
-# Author: Daniel Lowd <lowd@cs.uoregon.edu>
-# Date:   2/9/2018
+# Adapted from CS472/572 class materials
+# Logistic Regression template code by Daniel Lowd, 2/9/2018
 #
-# Please use this code as the template for your solution.
 #
 import sys
 import re
 from math import log
 from math import exp
 from math import sqrt
+import DataHandler
 
 MAX_ITERS = 100
 
@@ -18,33 +17,17 @@ MAX_ITERS = 100
 LEARNING_CUTOFF = 0.0001
 
 
-# Load data from a file
-def read_data(filename):
-    f = open(filename, 'r')
-    p = re.compile(',')
-    data = []
-    header = f.readline().strip()
-    varnames = p.split(header)
-    namehash = {}
-    for l in f:
-        example = [int(x) for x in p.split(l.strip())]
-        x = example[0:-1]
-        y = example[-1]
-        data.append((x, y))
-    return (data, varnames)
-
-
-# Train a logistic regression model using batch gradient descent
+# Cost function: least mean square regression
+# Train a linear regression model using batch gradient descent
 def train_lr(data, eta, l2_reg_weight):
     numexamples = len(data)
     numvars = len(data[0][0])
     w = [0.0] * numvars
     b = 0.0
 
-    for j in range(MAX_ITERS):
-
+    for z in range(MAX_ITERS):
         # Init sum vars for this iteration
-        loss_sum = 0
+        cost_sum = 0
         gr_wrt_w_sum = [0.0] * numvars
         gr_wrt_b_sum = 0
 
@@ -54,15 +37,14 @@ def train_lr(data, eta, l2_reg_weight):
             for i in range(numvars):
                 a += w[i] * d[i]
             a += b
-            ya = y * a
-
-            loss_sum += log(1 + exp(-ya))
-            denom = (1 + exp(ya))
+            
+            error = (a - y)
+            cost_sum += error**2
 
             # Update gradient sums
-            for i in range(numvars):
-                gr_wrt_w_sum[i] -= y*d[i] / denom
-            gr_wrt_b_sum -= y/denom
+            for j in range(numvars):
+                gr_wrt_w_sum[j] += error * d[j]
+            gr_wrt_b_sum += error
 
         reg_cost = 0
         magn = 0
@@ -72,17 +54,19 @@ def train_lr(data, eta, l2_reg_weight):
             reg_cost += w[i]**2
             magn += gr_wrt_w_sum[i]**2
 
-        total_loss = ((1/numexamples) * loss_sum) + (l2_reg_weight/(2*numexamples)) * reg_cost
+        total_cost = (1/2) * cost_sum
         magn = sqrt(magn)
 
-        if (j % 10 == 0):
-            # print(f"Cost function at end of iteration {j}: {total_loss}")
-            # print(f"Magnitude of w gradient vector: {magn}\n")
+        if (z % 10 == 0):
+            print(f"Cost function at end of iteration {z}: {total_cost}")
+            print(f"Magnitude of w gradient vector: {magn}\n")
             pass
 
         # Check for convergence
         if (j != 0 and magn <= LEARNING_CUTOFF):
+            print("Model converged. Ending training...")
             break
+
         # update weights and bias
         for i in range(numvars):
             w[i] -= eta * gr_wrt_w_sum[i]
@@ -92,9 +76,9 @@ def train_lr(data, eta, l2_reg_weight):
     return (w, b)
 
 
-# Predict the probability of the positive label (y=+1) given the
-# attributes, x.
-def predict_lr(model, x):
+# Predict the value of the y (continuous) given the
+# input attributes, x.
+def predict(model, x):
     (w, b) = model
 
     activation = 0.0
@@ -102,9 +86,52 @@ def predict_lr(model, x):
         activation += w[i]*x[i]
     activation += b
 
-    return (1 / (1 + exp(-activation))) 
+    return activation 
 
 
+def print_model(modelfile, model, varnames):
+    (w, b) = model
+    # Write model file
+    f = open(modelfile, "w+")
+    f.write('Bias:\n%f\n' % b)
+    f.write('Weights:\n')
+    for i in range(len(w)):
+        f.write('%s: %f\n' % (varnames[i], w[i]))
+
+
+def calculateMSE(test_data, training_data, model):
+    sum_squared_error = 0
+    for ex in test_data:
+        input_params, val = ex
+        pred = predict(model, input_params)
+        # print(f"Prediction: {pred}, actual value in test data: {val}")
+
+        sum_squared_error += (val - pred)**2
+
+    acc = float(sum_squared_error) / len(test_data)
+    return acc
+
+
+def main(argv):
+    if (len(argv) != 4):
+        print('Usage:')
+        print('python3 LinearRegression.py <csv_data> <learning_rate> <regularizer> <model>')
+        sys.exit(2)
+    raw_data, varnames = DataHandler.read_data(argv[0])
+    eta = float(argv[1])
+    l2_reg_weight = float(argv[2])
+    modelfile = argv[3]
+    training, test, validation = DataHandler.split_data(raw_data)
+    model = train_lr(training, eta, l2_reg_weight)
+    print_model(modelfile, model, varnames)
+    MSE = calculateMSE(test, training, model)
+    print("Mean Squared Error: ", round(MSE, 3))
+    
+    # Root mean squared error quantifies error using the original data's measurement units
+    print("Average error in original measurement units: ", round(MSE**(0.5), 3)) 
+
+
+""" # OLD
 # Load train and test data.  Learn model.  Report accuracy.
 def main(argv):
     if (len(argv) != 5):
@@ -134,7 +161,7 @@ def main(argv):
             correct += 1
     acc = float(correct) / len(test)
     print("Accuracy: ", acc)
-
+"""
 
 if __name__ == "__main__":
     main(sys.argv[1:])
