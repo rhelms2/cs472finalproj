@@ -11,21 +11,19 @@ from math import exp
 from math import sqrt
 import DataHandler
 
-MAX_ITERS = 100
-
 # Const for when to stop learning based off of if magnitude of gradient is <=
 LEARNING_CUTOFF = 0.0001
 
 
 # Cost function: least mean square regression
 # Train a linear regression model using batch gradient descent
-def train_lr(data, eta, l2_reg_weight):
+def train_lr(data, eta, l2_reg_weight, epochs):
     numexamples = len(data)
     numvars = len(data[0][0])
     w = [0.0] * numvars
     b = 0.0
 
-    for z in range(MAX_ITERS):
+    for z in range(epochs):
         # Init sum vars for this iteration
         cost_sum = 0
         gr_wrt_w_sum = [0.0] * numvars
@@ -33,10 +31,7 @@ def train_lr(data, eta, l2_reg_weight):
 
         for d, y in data:
             # Get activation
-            a = 0.0
-            for i in range(numvars):
-                a += w[i] * d[i]
-            a += b
+            a = predict((w, b), d)
             
             error = (a - y)
             cost_sum += error**2
@@ -46,20 +41,19 @@ def train_lr(data, eta, l2_reg_weight):
                 gr_wrt_w_sum[j] += error * d[j]
             gr_wrt_b_sum += error
 
-        reg_cost = 0
         magn = 0
         # Regularize w_gradient, get cost and magnitude
+        gr_wrt_b_sum /= numexamples
         for i in range(numvars):
-            gr_wrt_w_sum[i] += l2_reg_weight * w[i]
-            reg_cost += w[i]**2
+            gr_wrt_w_sum[i] = (gr_wrt_w_sum[i]/numexamples) + l2_reg_weight * w[i]
             magn += gr_wrt_w_sum[i]**2
 
-        total_cost = (1/2) * cost_sum
+        total_cost = (1/numexamples) * (0.5) * cost_sum
         magn = sqrt(magn)
 
         if (z % 10 == 0):
-            print(f"Cost function at end of iteration {z}: {total_cost}")
-            print(f"Magnitude of w gradient vector: {magn}\n")
+            print(f"Cost function at end of iteration {z}: {round(total_cost, 3)}")
+            print(f"Magnitude of w gradient vector: {round(magn, 3)}\n")
             pass
 
         # Check for convergence
@@ -101,28 +95,35 @@ def print_model(modelfile, model, varnames):
 
 def calculateMSE(test_data, training_data, model):
     sum_squared_error = 0
+    test_print_tally = 0
     for ex in test_data:
         input_params, val = ex
         pred = predict(model, input_params)
-        # print(f"Prediction: {pred}, actual value in test data: {val}")
+
+        if test_print_tally % 1000 == 0:
+            print(f"Prediction: {round(pred, 3)}, actual value in test data: {val}")
+            print(f"Sum of squared error at test case {round(test_print_tally, 3)}: {sum_squared_error}")
+        test_print_tally += 1
 
         sum_squared_error += (val - pred)**2
 
+    print("\n")
     acc = float(sum_squared_error) / len(test_data)
     return acc
 
 
 def main(argv):
-    if (len(argv) != 4):
+    if (len(argv) != 5):
         print('Usage:')
-        print('python3 LinearRegression.py <csv_data> <learning_rate> <regularizer> <model>')
+        print('python3 LinearRegression.py <csv_data> <learning_rate> <regularizer> <num_epochs> <model>')
         sys.exit(2)
     raw_data, varnames = DataHandler.read_data(argv[0])
     eta = float(argv[1])
     l2_reg_weight = float(argv[2])
-    modelfile = argv[3]
+    epochs = int(argv[3])
+    modelfile = argv[4]
     training, test, validation = DataHandler.split_data(raw_data)
-    model = train_lr(training, eta, l2_reg_weight)
+    model = train_lr(training, eta, l2_reg_weight, epochs)
     print_model(modelfile, model, varnames)
     MSE = calculateMSE(test, training, model)
     print("Mean Squared Error: ", round(MSE, 3))
@@ -130,38 +131,6 @@ def main(argv):
     # Root mean squared error quantifies error using the original data's measurement units
     print("Average error in original measurement units: ", round(MSE**(0.5), 3)) 
 
-
-""" # OLD
-# Load train and test data.  Learn model.  Report accuracy.
-def main(argv):
-    if (len(argv) != 5):
-        print('Usage: lr.py <train> <test> <eta> <lambda> <model>')
-        sys.exit(2)
-    (train, varnames) = read_data(argv[0])
-    (test, testvarnames) = read_data(argv[1])
-    eta = float(argv[2])
-    lam = float(argv[3])
-    modelfile = argv[4]
-
-    # Train model
-    (w, b) = train_lr(train, eta, lam)
-
-    # Write model file
-    f = open(modelfile, "w+")
-    f.write('%f\n' % b)
-    for i in range(len(w)):
-        f.write('%s %f\n' % (varnames[i], w[i]))
-
-    # Make predictions, compute accuracy
-    correct = 0
-    for (x, y) in test:
-        prob = predict_lr((w, b), x)
-        print(prob)
-        if (prob - 0.5) * y > 0:
-            correct += 1
-    acc = float(correct) / len(test)
-    print("Accuracy: ", acc)
-"""
 
 if __name__ == "__main__":
     main(sys.argv[1:])

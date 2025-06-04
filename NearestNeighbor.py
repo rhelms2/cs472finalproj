@@ -34,9 +34,13 @@ def predict(data, ex_to_predict, k):
 
 def calculateMSE(test_data, training_data, k):
     sum_squared_error = 0
+    test_print_tally = 0
     for ex in test_data:
         pred = predict(training_data, ex, k)
-        # print(f"Prediction: {pred}, actual value in test data: {ex[1]}")
+        if test_print_tally % 1000 == 0:
+            print(f"Prediction: {round(pred, 3)}, actual value in test data: {ex[1]}")
+            print(f"Sum of squared error at test case {round(test_print_tally, 3)}: {sum_squared_error}")
+        test_print_tally += 1
 
         sum_squared_error += (ex[1] - pred)**2
 
