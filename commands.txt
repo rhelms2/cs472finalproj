@@ -2,6 +2,11 @@
 
 python3 LinearRegression.py calories.csv 0.00004 .01 lr_model.txt
 
+# Better!
+
+python3 LinearRegression.py calories.csv 0.00004064 .01 10000 lr_model.txt
+
+
 # Optimal k-nearest neighbor
 
-python3 NearestNeighbor.py calories.csv 10
+python3 NearestNeighbor.py calories.csv 12

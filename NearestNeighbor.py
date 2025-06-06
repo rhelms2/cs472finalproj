@@ -1,62 +1,66 @@
-# Holds logic for k-nearest neightbor model used to predict calorie expenditure
+#
+#
+# Holds logic for k-nearest neightbor model
+#
+#
 import sys
 import DataHandler
+import ModelTester
 
 
-# Squared Euclidean distance
-def sq_distance(ex1, ex2):
-    num_params = len(ex1)
-    distance = 0
-    for i in range(num_params):
-        distance += (ex1[i] - ex2[i])**2
-    return distance
+class NearestNeighbor():
 
-# Returns the average y value of the first k of examples, where examples are tuples of (distance, y)
-def average_ky(examples, k):
-    average = 0
-    for i in range(k):
-        average += examples[i][1]
-    average = average / k
-    return average
+    def __init__(self, training, k):
+        self.model = training
+        self.len_data = len(training)
+        self.k = k
 
-# IMPORTANT - distances is encoded as a list of tuples, where tuple[0] = distance, and tuple[1] is the y value for that associated distance
-def predict(data, ex_to_predict, k):
-    len_data = len(data)
-    # Iterate over data and collect distances of each example from the example to predict
-    distances = []
-    for i in range(len_data):
-        distances.append((sq_distance(data[i][0], ex_to_predict[0]), data[i][1]))
-    distances = sorted(distances) # sort tuples in ascending order based off distance measure
+    # Squared Euclidean distance
+    def __sq_distance(self, ex1, ex2):
+        num_params = len(ex1)
+        distance = 0
+        for i in range(num_params):
+            distance += (ex1[i] - ex2[i])**2
+        return distance
 
-    prediction = distances[0][1] if k == 1 else average_ky(distances, k)
-    return prediction
+    # Returns the average y value of the first k of examples, where examples are tuples of (distance, y)
+    def __average_ky(self, examples):
+        average = 0
+        for i in range(self.k):
+            average += examples[i][1]
+        average = average / self.k
+        return average
 
+    # IMPORTANT - distances is encoded as a list of tuples, where tuple[0] = distance, and tuple[1] is the y value for that associated distance
+    def predict(self, ex_to_predict):
+        # Iterate over data and collect distances of each example from the example to predict
+        distances = []
+        for i in range(self.len_data):
+            distances.append((self.__sq_distance(self.model[i][0], ex_to_predict), self.model[i][1]))
+        distances = sorted(distances) # sort tuples in ascending order based off distance measure
 
-def calculateMSE(test_data, training_data, k):
-    sum_squared_error = 0
-    test_print_tally = 0
-    for ex in test_data:
-        pred = predict(training_data, ex, k)
-        if test_print_tally % 1000 == 0:
-            print(f"Prediction: {round(pred, 3)}, actual value in test data: {ex[1]}")
-            print(f"Sum of squared error at test case {round(test_print_tally, 3)}: {sum_squared_error}")
-        test_print_tally += 1
-
-        sum_squared_error += (ex[1] - pred)**2
-
-    acc = float(sum_squared_error) / len(test_data)
-    return acc
+        prediction = distances[0][1] if self.k == 1 else self.__average_ky(distances)
+        return prediction
 
 
 def main(argv):
     if (len(argv) != 2):
         print('Usage: python3 k-nearestneighbor.py <csv_data> <K>')
         sys.exit(2)
+
+    # Get input data
     raw_data, varnames = DataHandler.read_data(argv[0])
+    k = int(argv[1])
+
+    # Split
     training, test, validation = DataHandler.split_data(raw_data)
-    K = int(argv[1])
-    MSE = calculateMSE(test, training, K)
-    print("K: ", K)
+
+    # Create model
+    model = NearestNeighbor(training, k)
+
+    # Test and print results
+    MSE = ModelTester.calculateMSE(model, test)
+    print("K: ", k)
     print("Mean Squared Error: ", round(MSE, 3))
     
     # Root mean squared error quantifies error using the original data's measurement units

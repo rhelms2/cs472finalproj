@@ -1,10 +1,10 @@
 Bias:
--0.066290
+-0.004566
 Weights:
-Gender: -0.054959
-Age: 0.452184
-Height: -0.751754
-Weight: 0.768978
-Duration: 5.641944
-Heart_Rate: 1.745228
-Body_Temp: -2.760193
+Gender: 0.002772
+Age: 0.192219
+Height: -0.661491
+Weight: -0.154334
+Duration: 1.471934
+Heart_Rate: 1.203422
+Body_Temp: -0.059970
