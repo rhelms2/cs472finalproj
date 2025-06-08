@@ -45,7 +45,7 @@ def main(argv):
     print("Mean Squared Error: ", round(MSE, 3))
     
     # Root mean squared error quantifies error using the original data's measurement units
-    print("Average error in original measurement units: ", round(MSE**(0.5), 3)) 
+    print("Average squared error in original measurement units: ", round(MSE**(0.5), 3)) 
 
 
 if __name__ == "__main__":
