@@ -1,0 +1,61 @@
+# When ran on google colab
+
+Training Nearest Neighbor:
+Training time: 1.0728836059570312e-05 seconds
+
+Testing Nearest Neighbor:
+
+Prediction: 15.083, actual value in test data: 13.0
+Sum of squared error at test case 0: 0
+Prediction: 168.25, actual value in test data: 173.0
+Sum of squared error at test case 1000: 60342.34722222236
+Prediction: 18.25, actual value in test data: 17.0
+Sum of squared error at test case 2000: 111398.63194444372
+
+Testing time for 3000 predictions: 59.67203426361084 seconds
+Average predition time: 0.01989067808787028 seconds
+Mean Squared Error:  54.818
+Average squared error in original measurement units:  7.404
+
+Training Linear Regression for 10000 epochs:
+Training time: 150.18624186515808 seconds
+
+Testing Linear Regression:
+
+Prediction: 11.692, actual value in test data: 13.0
+Sum of squared error at test case 0: 0
+Prediction: 165.879, actual value in test data: 173.0
+Sum of squared error at test case 1000: 155034.3942015499
+Prediction: 13.771, actual value in test data: 17.0
+Sum of squared error at test case 2000: 313576.86291617237
+
+Testing time for 3000 predictions: 0.005026817321777344 seconds
+Average prediction time: 1.6756057739257812e-06 seconds
+Mean Squared Error:  155.277
+Average squared error in original measurement units:  12.461
+
+Training Neural Network for 10000 epochs:
+Finished training
+
+Training time: 33.734517097473145 seconds
+
+Testing Neural Net:
+
+Prediction: 8.389, actual value in test data: 13.0
+Sum of squared error at test case 0: 0
+Prediction: 167.063, actual value in test data: 173.0
+Sum of squared error at test case 1000: 144154.43817422312
+Prediction: 13.262, actual value in test data: 17.0
+Sum of squared error at test case 2000: 288701.3504276318
+
+Testing time for 3000 predictions: 0.3183248043060303
+Average prediction time: 0.0001061082681020101
+Mean Squared Error:  143.446
+Average squared error in original measurement units:  11.977
+
+Best training time: Nearest Neighbor 1.0728836059570312e-05
+Best test time: Linear Regression 0.005026817321777344
+Best overall time: Neural Net 34.052841901779175
+Best accuracy: Nearest Neighbor 54.818370370370474
+
+
