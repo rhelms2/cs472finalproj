@@ -18,14 +18,14 @@ LEARNING_CUTOFF = 0.0001
 
 class LinearRegression():
 
-    def __init__(self, data, eta, l2_reg_weight, epochs):
+    def __init__(self, data, eta, l2_reg_weight, epochs, b_print):
         self.numexamples = len(data)
         self.numvars = len(data[0][0])
-        self.model = self.__train(data, eta, l2_reg_weight, epochs)
+        self.model = self.__train(data, eta, l2_reg_weight, epochs, b_print)
 
     # Train a linear regression model using batch gradient descent   
     # Cost function: least mean square regression
-    def __train(self, data, eta, l2_reg_weight, epochs):
+    def __train(self, data, eta, l2_reg_weight, epochs, b_print):
         w = [0.0] * self.numvars
         b = 0.0
         for z in range(epochs):
@@ -59,13 +59,14 @@ class LinearRegression():
             total_cost = (1/self.numexamples) * (0.5) * cost_sum
             magn = sqrt(magn)
 
-            if (z % 10 == 0):
+            if b_print and (z % 10 == 0):
                 print(f"Cost function at end of iteration {z}: {round(total_cost, 3)}")
                 print(f"Magnitude of w gradient vector: {round(magn, 3)}\n")
                 pass
             # Check for convergence
             if (j != 0 and magn <= LEARNING_CUTOFF):
-                print("Model converged. Ending training...")
+                if (b_print):
+                    print("Model converged. Ending training...")
                 break
             # update weights and bias
             for i in range(self.numvars):
@@ -111,7 +112,7 @@ def main(argv):
     training, test, validation = DataHandler.split_data(raw_data)
 
     # Create model
-    model = LinearRegression(training, eta, l2_reg_weight, epochs)
+    model = LinearRegression(training, eta, l2_reg_weight, epochs, b_print=True)
 
     # Output weights and bias, print testing results
     print_model(modelfile, model, varnames)

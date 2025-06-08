@@ -45,7 +45,7 @@ class NearestNeighbor():
 
 def main(argv):
     if (len(argv) != 2):
-        print('Usage: python3 k-nearestneighbor.py <csv_data> <K>')
+        print('Usage: python3 NearestNeighbor.py <csv_data> <K>')
         sys.exit(2)
 
     # Get input data
