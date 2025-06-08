@@ -10,7 +10,7 @@ from math import log
 from math import exp
 from math import sqrt
 import DataHandler
-import ModelTester
+import MSE as ModelTester
 
 # Const for when to stop learning based off of if magnitude of gradient is <=
 LEARNING_CUTOFF = 0.0001

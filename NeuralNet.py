@@ -9,8 +9,7 @@ import torch.optim as optim
 import numpy as np
 import sys
 import DataHandler
-from ModelTester import calculateMSE
-
+import MSE as ModelTester
 
 class NeuralNet(nn.Module):
 
@@ -48,7 +47,7 @@ class NeuralNet(nn.Module):
         self.train_nn(criterion, optimizer, epochs, encoded_tr_features, encoded_tr_targets, b_print)
         print("Finished training\n")
 
-    def train_nn(self, criterion, optimizer, num_epochs, features, targets):
+    def train_nn(self, criterion, optimizer, num_epochs, features, targets, b_print):
         for epoch in range(num_epochs):
             # Forward pass
             outputs = self.model(features)

@@ -5,7 +5,7 @@
 #
 import sys
 import DataHandler
-import ModelTester
+import MSE as ModelTester
 
 
 class NearestNeighbor():

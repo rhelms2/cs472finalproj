@@ -9,30 +9,12 @@ import time
 import DataHandler
 from LinearRegression import *
 from NearestNeighbor import *
-# from NeuralNet import *
+from NeuralNet import *
 from hyperparams import *
+from MSE import calculateMSE
 
 
 MODELS = ["Nearest Neighbor", "Linear Regression", "Neural Net"]
-
-
-def calculateMSE(model, test_data):
-    sum_squared_error = 0
-    test_print_tally = 0
-    for ex in test_data:
-        input_params, val = ex
-        pred = model.predict(input_params)
-
-        if test_print_tally % 1000 == 0:
-            print(f"Prediction: {round(pred, 3)}, actual value in test data: {val}")
-            print(f"Sum of squared error at test case {round(test_print_tally, 3)}: {sum_squared_error}")
-        test_print_tally += 1
-
-        sum_squared_error += (val - pred)**2
-
-    print("")
-    acc = float(sum_squared_error) / len(test_data)
-    return acc
 
 
 def main(argv):
@@ -86,11 +68,10 @@ def main(argv):
     print(f"Average prediction time: {tst_time2 / len_test} seconds")
     print("Mean Squared Error: ", round(MSE2, 3))
     print("Average squared error in original measurement units: ", round(MSE2**(0.5), 3)) 
-
-    """
+    
     print(f"\nTraining Neural Network for {NUM_EPOCHS} epochs:")
     tr_start3 = time.time()
-    model3 = NeuralNet(training, NN_ETA, NUM_EPOCHS, b_print=false)
+    model3 = NeuralNet(training, NN_ETA, NUM_EPOCHS, b_print=False)
     tr_end3 = time.time()
     tr_time3 = tr_end3 - tr_start3
     print(f"Training time: {tr_time3} seconds")
@@ -102,11 +83,10 @@ def main(argv):
     tst_time3 = tst_end3 - tst_start3
     test_losses.append(MSE3)
     prediction_times.append(tst_time3)
-    print(f"Testing time for {len_test} queries: {tst_time3}")
-    print(f"Average query time: {tst_time3 / len_test}")
+    print(f"Testing time for {len_test} predictions: {tst_time3}")
+    print(f"Average prediction time: {tst_time3 / len_test}")
     print("Mean Squared Error: ", round(MSE3, 3))
     print("Average squared error in original measurement units: ", round(MSE3**(0.5), 3)) 
-    """
 
     overall_times = []
     for i in range(len(training_times)):
